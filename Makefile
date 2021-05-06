@@ -15,6 +15,7 @@ GOOS       := $(shell go env GOOS)
 CGO_ENABLED:=0
 LDBASE     := github.com/aserto-dev/aserto-idp-seed/pkg/version
 LDFLAGS    := -ldflags "-X ${LDBASE}.ver=${VERSION} -X ${LDBASE}.date=${DATE} -X ${LDBASE}.commit=${COMMIT}"
+GOPATH     := $(shell go env GOPATH)
 
 TARGET     := aserto-idp-seed
 ROOT_DIR   ?= $(shell git rev-parse --show-toplevel)
