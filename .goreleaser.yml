@@ -61,7 +61,7 @@ brews:
     tap:
       owner: aserto-dev
       name: homebrew-tap
-      token: "{{ .Env.GITHUB_TOKEN }}"
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
 
     url_template: "http://github.aserto-dev/aserto-idp-seed/releases/{{ .Tag }}/{{ .ArtifactName }}"
 
@@ -73,7 +73,7 @@ brews:
 
     homepage: "https://aserto.com/"
 
-    description: "IDP seed tool"
+    description: "Aserto IDP seed tool"
 
     license: "MIT"
 
