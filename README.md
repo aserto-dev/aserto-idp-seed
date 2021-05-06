@@ -1,2 +1,3 @@
 # aserto-idp-seed
-IDP seed tool
+
+Aserto IDP seed tool

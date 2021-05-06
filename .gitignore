@@ -1,5 +1,8 @@
 .DS_Store
 
 .ext/
+bin/
 dist/
 vendor/
+
+cover.out
