@@ -48,7 +48,7 @@ changelog:
 release:
   github:
     owner: aserto-dev
-    name: aserto-cli
+    name: aserto-idp-seed
 
   draft: true
   prerelease: false
