@@ -77,7 +77,7 @@ brews:
 
     license: "MIT"
 
-    skip_upload: true
+    skip_upload: false
 
     test: |
       system "#{bin}/aserto-idp-seed version"
