@@ -79,6 +79,7 @@ func (m *Manager) Seed(params *config.TemplateParams) error {
 	enc.SetEscapeHTML(true)
 	enc.SetIndent("", "  ")
 
+	m.counter.NoCount(m.nocount)
 	m.counter.Print(counter.Init)
 
 	dec := json.NewDecoder(r)
@@ -130,6 +131,7 @@ func (m *Manager) Seed(params *config.TemplateParams) error {
 func (m *Manager) Reset() error {
 	r := bytes.NewBuffer(data.Users)
 
+	m.counter.NoCount(m.nocount)
 	m.counter.Print(counter.Init)
 
 	dec := json.NewDecoder(r)

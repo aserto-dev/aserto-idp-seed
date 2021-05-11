@@ -30,6 +30,7 @@ archives:
     files:
       - LICENSE.md
       - README.md
+      - .env.template
     name_template: "aserto-idp-seed_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
