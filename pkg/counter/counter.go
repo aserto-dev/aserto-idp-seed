@@ -17,6 +17,7 @@ type Counter struct {
 	rowCounter  int32
 	skipCounter int32
 	errCounter  int32
+	nocount     bool
 }
 
 // IncrRows - increment row counter.
@@ -34,8 +35,17 @@ func (c *Counter) IncrError() {
 	atomic.AddInt32(&c.errCounter, 1)
 }
 
+// NoCount - turn off counting.
+func (c *Counter) NoCount(f bool) {
+	c.nocount = f
+}
+
 // Print - print counter at interval % m.
 func (c *Counter) Print(m int32) {
+	if c.nocount {
+		return
+	}
+
 	linefeed := ""
 
 	switch m {

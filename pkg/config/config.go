@@ -3,16 +3,18 @@ package config
 import (
 	"context"
 	"os"
+
+	"github.com/pkg/errors"
 )
 
 const (
 	configKey            = "config"
-	envAuth0Domain       = "AUTH0_DOMAIN"
-	envAuth0ClientID     = "AUTH0_CLIENT_ID"
-	envAuth0ClientSecret = "AUTH0_CLIENT_SECRET" //nolint: gosec
-	envTemplCorporation  = "TEMPL_CORPORATION"
-	envTemplEmailDomain  = "TEMPL_EMAIL_DOMAIN"
-	envTemplPassword     = "TEMPL_PASSWORD"
+	EnvAuth0Domain       = "AUTH0_DOMAIN"
+	EnvAuth0ClientID     = "AUTH0_CLIENT_ID"
+	EnvAuth0ClientSecret = "AUTH0_CLIENT_SECRET" //nolint: gosec
+	EnvTemplCorporation  = "TEMPL_CORPORATION"
+	EnvTemplEmailDomain  = "TEMPL_EMAIL_DOMAIN"
+	EnvTemplPassword     = "TEMPL_PASSWORD"
 )
 
 type key string
@@ -30,24 +32,50 @@ type Auth0 struct {
 	ClientSecret string
 }
 
+const errEnvNotSetMsg = "%s environment variable not set"
+
+func (a *Auth0) Validate() error {
+	switch {
+	case a.Domain == "":
+		return errors.Errorf(errEnvNotSetMsg, EnvAuth0Domain)
+	case a.ClientID == "":
+		return errors.Errorf(errEnvNotSetMsg, EnvAuth0ClientID)
+	case a.ClientSecret == "":
+		return errors.Errorf(errEnvNotSetMsg, EnvAuth0ClientSecret)
+	}
+	return nil
+}
+
 type TemplateParams struct {
 	Corporation string
 	EmailDomain string
 	Password    string
 }
 
+func (t *TemplateParams) Validate() error {
+	switch {
+	case t.Corporation == "":
+		return errors.Errorf(errEnvNotSetMsg, EnvTemplCorporation)
+	case t.EmailDomain == "":
+		return errors.Errorf(errEnvNotSetMsg, EnvTemplEmailDomain)
+	case t.Password == "":
+		return errors.Errorf(errEnvNotSetMsg, EnvTemplPassword)
+	}
+	return nil
+}
+
 // FromEnv - create config instance from environment variables
 func FromEnv() *Config {
 	cfg := Config{
 		Auth0: &Auth0{
-			Domain:       os.Getenv(envAuth0Domain),
-			ClientID:     os.Getenv(envAuth0ClientID),
-			ClientSecret: os.Getenv(envAuth0ClientSecret),
+			Domain:       os.Getenv(EnvAuth0Domain),
+			ClientID:     os.Getenv(EnvAuth0ClientID),
+			ClientSecret: os.Getenv(EnvAuth0ClientSecret),
 		},
 		TemplateParams: &TemplateParams{
-			Corporation: os.Getenv(envTemplCorporation),
-			EmailDomain: os.Getenv(envTemplEmailDomain),
-			Password:    os.Getenv(envTemplPassword),
+			Corporation: os.Getenv(EnvTemplCorporation),
+			EmailDomain: os.Getenv(EnvTemplEmailDomain),
+			Password:    os.Getenv(EnvTemplPassword),
 		},
 	}
 	return &cfg

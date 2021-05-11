@@ -28,6 +28,7 @@ func main() {
 	appl.Commands = []*cli.Command{
 		cmdx.SeedCommand(),
 		cmdx.ResetCommand(),
+		cmdx.UsersCommand(),
 		cmdx.VersionCommand(),
 	}
 

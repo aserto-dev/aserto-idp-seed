@@ -1,6 +1,9 @@
 package cmdx
 
-import "github.com/urfave/cli/v2"
+import (
+	"github.com/aserto-dev/aserto-idp-seed/pkg/config"
+	"github.com/urfave/cli/v2"
+)
 
 // InputFileFlag -- input file flag.
 func InputFileFlag() cli.Flag {
@@ -28,5 +31,41 @@ func SpewFlag() cli.Flag {
 		Name:    flagSpew,
 		Aliases: []string{},
 		Usage:   usageSpew,
+	}
+}
+
+// NoCountFlag -- no count flag.
+func NoCountFlag() cli.Flag {
+	return &cli.BoolFlag{
+		Name:    flagNoCount,
+		Aliases: []string{},
+		Usage:   usageNoCount,
+	}
+}
+
+func CorporationFlag() cli.Flag {
+	return &cli.StringFlag{
+		Name:    flagCorporation,
+		Aliases: []string{},
+		Usage:   usageCorporation,
+		EnvVars: []string{config.EnvTemplCorporation},
+	}
+}
+
+func EmailDomainFlag() cli.Flag {
+	return &cli.StringFlag{
+		Name:    flagEmailDomain,
+		Aliases: []string{},
+		Usage:   usageEmailDomain,
+		EnvVars: []string{config.EnvTemplEmailDomain},
+	}
+}
+
+func PasswordFlag() cli.Flag {
+	return &cli.StringFlag{
+		Name:    flagPassword,
+		Aliases: []string{},
+		Usage:   usagePassword,
+		EnvVars: []string{config.EnvTemplPassword},
 	}
 }

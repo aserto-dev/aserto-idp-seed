@@ -7,32 +7,26 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// SeedCommand -- seed, add entries from the seed file.
-func SeedCommand() *cli.Command {
+// UsersCommand -- list existing users.
+func UsersCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "seed",
-		Usage: "seed users",
+		Name:  "users",
+		Usage: "list existing users",
 		Flags: []cli.Flag{
-			InputFileFlag(),
 			SpewFlag(),
 			NoCountFlag(),
-			DryrunFlag(),
 		},
 		Before: configRetriever,
-		Action: seedHandler,
+		Action: usersHandler,
 	}
 }
 
-func seedHandler(c *cli.Context) (err error) {
+func usersHandler(c *cli.Context) (err error) {
 	// get config from context
 	cfg := config.FromContext(c.Context)
 
 	if err := cfg.Auth0.Validate(); err != nil {
 		return errors.Wrapf(err, "auth0 configuration missing")
-	}
-
-	if err := cfg.TemplateParams.Validate(); err != nil {
-		return errors.Wrapf(err, "template values missings")
 	}
 
 	mgr := auth0.NewManager(cfg.Auth0)
@@ -41,11 +35,10 @@ func seedHandler(c *cli.Context) (err error) {
 		return err
 	}
 
-	mgr.Dryrun(c.Bool(flagDryRun))
 	mgr.Spew(c.Bool(flagSpew))
 	mgr.NoCount(c.Bool(flagNoCount))
 
-	if err := mgr.Seed(cfg.TemplateParams); err != nil {
+	if err := mgr.Users(); err != nil {
 		return err
 	}
 

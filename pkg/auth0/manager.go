@@ -22,14 +22,16 @@ type Manager struct {
 	mgnt    *management.Management
 	spew    bool
 	exec    bool
+	nocount bool
 	counter counter.Counter
 }
 
 // NewManager Auth0 management interface.
-func NewManager(cfg *config.Auth0, filename string) *Manager {
+func NewManager(cfg *config.Auth0) *Manager {
 	manager := Manager{
 		config:  cfg,
 		exec:    true,
+		nocount: false,
 		counter: counter.Counter{},
 	}
 	return &manager
@@ -61,6 +63,11 @@ func (m *Manager) Spew(f bool) {
 // Dryrun, no execution mode,default off
 func (m *Manager) Dryrun(f bool) {
 	m.exec = !f
+}
+
+// NoCount, no count output.
+func (m *Manager) NoCount(f bool) {
+	m.nocount = f
 }
 
 // Seed, seed Auth0 with test user identities.
@@ -142,6 +149,44 @@ func (m *Manager) Reset() error {
 
 		m.counter.IncrRows()
 		m.counter.Print(counterInterval)
+	}
+
+	m.counter.Print(counter.Last)
+
+	return nil
+}
+
+func (m *Manager) Users() error {
+
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetEscapeHTML(true)
+	enc.SetIndent("", "  ")
+
+	m.counter.NoCount(m.nocount)
+	m.counter.Print(counter.Init)
+
+	page := 0
+	for {
+		opts := management.Page(page)
+		ul, err := m.mgnt.User.List(opts)
+		if err != nil {
+			return errors.Wrapf(err, "list users")
+		}
+
+		for _, user := range ul.Users {
+			if m.spew {
+				_ = enc.Encode(user)
+			}
+			m.counter.IncrRows()
+			m.counter.Print(counterInterval)
+
+		}
+
+		if ul.Length < ul.Limit {
+			break
+		}
+
+		page++
 	}
 
 	m.counter.Print(counter.Last)
