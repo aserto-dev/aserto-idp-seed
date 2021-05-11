@@ -1,8 +1,11 @@
 .DS_Store
+.env
+
+cover.out
+
+.vscode/launch.json
 
 .ext/
 bin/
 dist/
 vendor/
-
-cover.out

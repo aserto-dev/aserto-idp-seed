@@ -7,6 +7,7 @@ import (
 
 	"github.com/aserto-dev/aserto-idp-seed/cmd/aserto-idp-seed/cmdx"
 	"github.com/aserto-dev/aserto-idp-seed/pkg/version"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/urfave/cli/v2"
 )
 
@@ -25,6 +26,8 @@ func main() {
 	appl.HideVersion = true
 	appl.Version = version.GetInfo().String()
 	appl.Commands = []*cli.Command{
+		cmdx.SeedCommand(),
+		cmdx.ResetCommand(),
 		cmdx.VersionCommand(),
 	}
 
