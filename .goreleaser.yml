@@ -50,7 +50,7 @@ release:
     owner: aserto-dev
     name: aserto-idp-seed
 
-  draft: true
+  draft: false
   prerelease: false
   name_template: "{{.Tag}}"
 
@@ -64,8 +64,6 @@ brews:
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
 
     url_template: "https://github.com/aserto-dev/aserto-idp-seed/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-
-    download_strategy: GitDownloadStrategy
 
     commit_author:
       name: Aserto Bot
