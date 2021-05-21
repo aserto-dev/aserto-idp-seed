@@ -3,6 +3,7 @@ package auth0
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"os"
 
@@ -167,7 +168,11 @@ func (m *Manager) Users() error {
 	m.counter.NoCount(m.nocount)
 	m.counter.Print(counter.Init)
 
+	if m.spew {
+		fmt.Fprintf(os.Stdout, "[\n")
+	}
 	page := 0
+	first := false
 	for {
 		opts := management.Page(page)
 		ul, err := m.mgnt.User.List(opts)
@@ -177,11 +182,14 @@ func (m *Manager) Users() error {
 
 		for _, user := range ul.Users {
 			if m.spew {
+				if first {
+					fmt.Fprintf(os.Stdout, ",")
+				}
 				_ = enc.Encode(user)
+				first = true
 			}
 			m.counter.IncrRows()
 			m.counter.Print(counterInterval)
-
 		}
 
 		if ul.Length < ul.Limit {
@@ -189,6 +197,9 @@ func (m *Manager) Users() error {
 		}
 
 		page++
+	}
+	if m.spew {
+		fmt.Fprintf(os.Stdout, "]\n")
 	}
 
 	m.counter.Print(counter.Last)

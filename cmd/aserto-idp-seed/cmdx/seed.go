@@ -32,7 +32,7 @@ func seedHandler(c *cli.Context) (err error) {
 	}
 
 	if err := cfg.TemplateParams.Validate(); err != nil {
-		return errors.Wrapf(err, "template values missings")
+		return errors.Wrapf(err, "template values missing")
 	}
 
 	mgr := auth0.NewManager(cfg.Auth0)
