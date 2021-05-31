@@ -17,6 +17,8 @@ func SeedCommand() *cli.Command {
 			SpewFlag(),
 			NoCountFlag(),
 			DryrunFlag(),
+			UserMetadataFlag(),
+			AppMetadataFlag(),
 		},
 		Before: configRetriever,
 		Action: seedHandler,
@@ -44,6 +46,8 @@ func seedHandler(c *cli.Context) (err error) {
 	mgr.Dryrun(c.Bool(flagDryRun))
 	mgr.Spew(c.Bool(flagSpew))
 	mgr.NoCount(c.Bool(flagNoCount))
+	mgr.ImportUserMetadata((c.Bool(flagUserMetadata)))
+	mgr.ImportAppMetadata((c.Bool(flagAppMetadata)))
 
 	if err := mgr.Seed(cfg.TemplateParams); err != nil {
 		return err

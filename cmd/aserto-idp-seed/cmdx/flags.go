@@ -69,3 +69,17 @@ func PasswordFlag() cli.Flag {
 		EnvVars: []string{config.EnvTemplPassword},
 	}
 }
+
+func UserMetadataFlag() cli.Flag {
+	return &cli.BoolFlag{
+		Name:  flagUserMetadata,
+		Usage: usageUserMetadata,
+	}
+}
+
+func AppMetadataFlag() cli.Flag {
+	return &cli.BoolFlag{
+		Name:  flagAppMetadata,
+		Usage: usageAppMetadata,
+	}
+}

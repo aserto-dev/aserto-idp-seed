@@ -19,12 +19,14 @@ const (
 )
 
 type Manager struct {
-	config  *config.Auth0
-	mgnt    *management.Management
-	spew    bool
-	exec    bool
-	nocount bool
-	counter counter.Counter
+	config       *config.Auth0
+	mgnt         *management.Management
+	spew         bool
+	exec         bool
+	nocount      bool
+	userMetadata bool
+	appMetadata  bool
+	counter      counter.Counter
 }
 
 // NewManager Auth0 management interface.
@@ -71,6 +73,14 @@ func (m *Manager) NoCount(f bool) {
 	m.nocount = f
 }
 
+func (m *Manager) ImportUserMetadata(f bool) {
+	m.userMetadata = f
+}
+
+func (m *Manager) ImportAppMetadata(f bool) {
+	m.appMetadata = f
+}
+
 // Seed, seed Auth0 with test user identities.
 func (m *Manager) Seed(params *config.TemplateParams) error {
 
@@ -103,6 +113,14 @@ func (m *Manager) Seed(params *config.TemplateParams) error {
 
 		if err := json.Unmarshal([]byte(s), &user); err != nil {
 			return errors.Wrapf(err, "unmarshal user")
+		}
+
+		if !m.userMetadata {
+			user.UserMetadata = make(map[string]interface{})
+		}
+
+		if !m.appMetadata {
+			user.AppMetadata = make(map[string]interface{})
 		}
 
 		if m.spew {
