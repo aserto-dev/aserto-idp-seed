@@ -320,7 +320,10 @@ func (m *Manager) Validate() error {
 	u.EmailVerified = auth0.Bool(false)
 
 	fmt.Printf(">>> create connection [%s]\n", m.config.Domain)
-	m.Init()
+	if err := m.Init(); err != nil {
+		log.Println("init", err)
+		return errors.Wrapf(err, "init")
+	}
 
 	fmt.Printf(">>> create user with id [%s]\n", testID)
 	if err := m.createUser(testID, u); err != nil {
