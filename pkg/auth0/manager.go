@@ -5,12 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"os"
 
 	"github.com/aserto-dev/aserto-idp-seed/pkg/config"
 	"github.com/aserto-dev/aserto-idp-seed/pkg/counter"
 	"github.com/aserto-dev/aserto-idp-seed/pkg/data"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"gopkg.in/auth0.v5"
 	"gopkg.in/auth0.v5/management"
 )
 
@@ -246,6 +249,7 @@ func (m *Manager) userExists(id string) bool {
 	}
 
 	if _, err := m.mgnt.User.Read("auth0|" + id); err != nil {
+		log.Println("user-exists", err)
 		return false
 	}
 	return true
@@ -257,6 +261,7 @@ func (m *Manager) createUser(id string, u *management.User) error {
 	}
 
 	if err := m.mgnt.User.Create(u); err != nil {
+		log.Println("create-user", err)
 		m.counter.IncrError()
 		return err
 	}
@@ -272,8 +277,12 @@ func (m *Manager) updateUser(id string, u *management.User) error {
 	// reset fields which cannot be changed
 	u.ID = nil
 	u.Password = nil
+	u.Identities = nil
+	u.CreatedAt = nil
+	u.UpdatedAt = nil
 
 	if err := m.mgnt.User.Update("auth0|"+id, u); err != nil {
+		log.Println("update-user", err)
 		m.counter.IncrError()
 		return err
 	}
@@ -288,6 +297,7 @@ func (m *Manager) deleteUser(id string) error {
 
 	if m.userExists(id) {
 		if err := m.mgnt.User.Delete("auth0|" + id); err != nil {
+			log.Println("delete-user", err)
 			m.counter.IncrError()
 			return err
 		}
@@ -295,3 +305,75 @@ func (m *Manager) deleteUser(id string) error {
 
 	return nil
 }
+
+func (m *Manager) Validate() error {
+	var u *management.User
+
+	if err := json.Unmarshal([]byte(dummy), &u); err != nil {
+		return errors.Wrapf(err, "decode dummy user")
+	}
+
+	testID := uuid.NewString()
+
+	u.ID = auth0.String(testID)
+	u.Email = auth0.String(testID + "@aserto.com")
+	u.EmailVerified = auth0.Bool(false)
+
+	fmt.Printf(">>> create connection [%s]\n", m.config.Domain)
+	m.Init()
+
+	fmt.Printf(">>> create user with id [%s]\n", testID)
+	if err := m.createUser(testID, u); err != nil {
+		log.Println("create-user", err)
+		return errors.Wrapf(err, "create user")
+	}
+
+	fmt.Printf(">>> check if user with id exists [%s]\n", testID)
+	if !m.userExists(testID) {
+		return errors.Errorf("user not found")
+	}
+
+	u.Nickname = auth0.String("test2")
+
+	fmt.Printf(">>> update user with id [%s]\n", testID)
+	if err := m.updateUser(testID, u); err != nil {
+		log.Println("update-user", err)
+		return errors.Wrapf(err, "create user")
+	}
+
+	fmt.Printf(">>> delete user with id [%s]\n", testID)
+	if err := m.deleteUser(testID); err != nil {
+		log.Println("delete-user", err)
+		return errors.Wrapf(err, "create user")
+	}
+
+	return nil
+}
+
+const dummy string = `
+{
+	"connection": "Username-Password-Authentication",
+	"email": "",
+	"given_name": "test",
+	"family_name": "test",
+	"nickname": "test users - feel free to delete this user",
+	"password": "V@rySecr#et321!",
+	"user_metadata": {
+	  "department": "test",
+	  "dn": "cn=test",
+	  "manager": "44444444-3333-2222-1111-000000000000",
+	  "phone": "+1-123-456-7890",
+	  "title": "tester",
+	  "username": "test"
+	},
+	"email_verified": true,
+	"app_metadata": {
+	  "roles": [
+		"user",
+		"test",
+		"aserto-idp-seed"
+	  ]
+	},
+	"picture": "https://github.com/aserto-demo/contoso-ad-sample/raw/main/UserImages/Chris%20Norred.jpg"
+}
+`
